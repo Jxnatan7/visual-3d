@@ -22,6 +22,6 @@ export const localFonts = {
 export const localModels = [
   // require("./models/example/example.glb"),
   // require("./models/example/ferrari.glb"),
-  // require("./models/example/ferrari-texturized.glb"),
+  require("./models/example/ferrari-texturized.glb"),
   require("./models/example/ferrari-texturized-transformed.glb"),
 ];

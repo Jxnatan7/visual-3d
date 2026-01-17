@@ -1,12 +1,12 @@
-import { ModelCompressed } from "@/components/theme/ModelCompressed";
-import { Scene } from "@/components/theme/Scene";
+import Model from "@/components/theme/Model";
+import Scene from "@/components/theme/Scene";
 import { View } from "react-native";
 
 export default function Example() {
   return (
     <View style={{ flex: 1 }}>
       <Scene>
-        <ModelCompressed />
+        <Model />
       </Scene>
     </View>
   );
