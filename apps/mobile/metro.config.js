@@ -21,6 +21,9 @@ config.resolver = {
 
 const originalResolveRequest = config.resolver.resolveRequest;
 
+config.resolver.assetExts.push("obj", "mtl", "png", "jpg", "glb", "gltf");
+config.resolver.sourceExts.push("js", "jsx", "json", "ts", "tsx", "cjs");
+
 config.resolver.resolveRequest = (context, moduleName, platform) => {
   if (moduleName === "zustand" || moduleName.startsWith("zustand/")) {
     return {

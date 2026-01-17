@@ -8,7 +8,7 @@ export default function TabLayout() {
   const token = useAuthStore((s) => s.token);
 
   if (!token) {
-    return <Redirect href="/init" />;
+    return <Redirect href="/example" />;
   }
 
   return (

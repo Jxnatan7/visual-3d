@@ -17,7 +17,7 @@ export { ErrorBoundary } from "expo-router";
 const queryClient = new QueryClient();
 
 export const unstable_settings = {
-  initialRouteName: "index",
+  initialRouteName: "example",
 };
 
 SplashScreen.preventAutoHideAsync();
@@ -57,6 +57,7 @@ function RootLayoutNav() {
                   animationDuration: 300,
                 }}
               >
+                <Stack.Screen name="example" />
                 <Stack.Screen name="init" />
                 <Stack.Screen name="login" />
                 <Stack.Screen name="register" />

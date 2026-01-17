@@ -57,7 +57,7 @@ export default function App() {
     >
       <Box flex={1} justifyContent="flex-end" alignItems="center" mb="xl">
         <Text variant="header" mb="l">
-          Easy - App
+          M
         </Text>
         <PlanetAnimation />
         <Box
@@ -86,7 +86,7 @@ export default function App() {
           text="Começar a conversar"
           marginVertical="s"
           onPress={() => {
-            push("/(communication-request)/(steps)/code");
+            push("/example");
           }}
         />
         <Button

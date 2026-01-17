@@ -3,7 +3,8 @@ import * as Font from "expo-font";
 import { Asset } from "expo-asset";
 import * as SplashScreen from "expo-splash-screen";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { localAnimations, localFonts, localImages } from "@/assets";
+import { localFonts, localImages, localModels } from "@/assets";
+import { useGLTF } from "@react-three/drei/core";
 
 export default function useAssets() {
   const [isReady, setIsReady] = useState(false);
@@ -18,13 +19,17 @@ export default function useAssets() {
           ...FontAwesome.font,
         });
 
-        const cacheImages = [...localImages, ...localAnimations].map(
-          (asset) => {
-            return Asset.fromModule(asset).downloadAsync();
-          }
-        );
+        const assetsToCache = [...localImages, ...localModels];
 
-        await Promise.all([fontPromise, ...cacheImages]);
+        const cacheAssets = assetsToCache.map((asset) => {
+          return Asset.fromModule(asset).downloadAsync();
+        });
+
+        const preloadModels = localModels.map((model) => {
+          return useGLTF.preload(model);
+        });
+
+        await Promise.all([fontPromise, ...cacheAssets, ...preloadModels]);
       } catch (e) {
         console.warn("Erro ao carregar assets:", e);
       } finally {
