@@ -3,9 +3,11 @@ import { StyleSheet } from "react-native";
 import { Canvas } from "@react-three/fiber/native";
 import { Center, Environment } from "@react-three/drei/native";
 import { Box } from "@/components/restyle";
-
 import { useViewerController } from "../useViewerController";
 import { InteractiveStage } from "../InteractiveStage";
+import Button from "../Button";
+import * as MediaLibrary from "expo-media-library";
+import { GifRecorder } from "../GifRecorder";
 import { DirectionalPad } from "../ControlButton";
 
 export type ModelViewerProps = {
@@ -21,7 +23,8 @@ const GL_CONFIG = {
   antialias: false,
   stencil: false,
   depth: true,
-  alpha: false,
+  alpha: true,
+  preserveDrawingBuffer: true,
 } as const;
 
 export const ModelViewer = ({
@@ -29,9 +32,18 @@ export const ModelViewer = ({
   initialRotation = [0, 0],
   autoRotate = true,
   showControls = true,
-  backgroundColor = "#F2F2F2",
+  backgroundColor = "#121212",
 }: ModelViewerProps) => {
   const controller = useViewerController({ initialRotation, autoRotate });
+  const [isRecording, setIsRecording] = React.useState(false);
+  const [status, requestPermission] = MediaLibrary.usePermissions();
+
+  const handleRecord = async () => {
+    if (status?.status !== "granted") {
+      await requestPermission();
+    }
+    setIsRecording(true);
+  };
 
   return (
     <Box style={[styles.container, { backgroundColor }]}>
@@ -46,8 +58,20 @@ export const ModelViewer = ({
           <InteractiveStage controller={controller}>
             <Center>{children}</Center>
           </InteractiveStage>
+          <GifRecorder
+            recording={isRecording}
+            onFinished={() => setIsRecording(false)}
+          />
         </Suspense>
       </Canvas>
+
+      <Box position="absolute" top={100} alignSelf="center" zIndex={10}>
+        <Button
+          text={isRecording ? "Recording..." : "Create GIF"}
+          onPress={handleRecord}
+          disabled={isRecording}
+        />
+      </Box>
 
       <Box
         pointerEvents="auto"
