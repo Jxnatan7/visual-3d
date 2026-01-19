@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 import { useThree, useFrame } from "@react-three/fiber/native";
 import { ExpoWebGLRenderingContext } from "expo-gl";
 import { Buffer } from "buffer";
@@ -8,8 +8,20 @@ import * as MediaLibrary from "expo-media-library";
 import { Alert, InteractionManager, Platform } from "react-native";
 // @ts-ignore
 import { GIFEncoder, quantize, applyPalette } from "gifenc";
+import {
+  WebGLRenderTarget,
+  RGBAFormat,
+  UnsignedByteType,
+  LinearFilter,
+  PerspectiveCamera,
+} from "three";
 
 global.Buffer = global.Buffer || Buffer;
+
+const GIF_WIDTH = 1000;
+const GIF_HEIGHT = 1000;
+const MAX_FRAMES = 30;
+const FRAME_SKIP = 4;
 
 export const GifRecorder = ({
   recording,
@@ -18,48 +30,85 @@ export const GifRecorder = ({
   recording: boolean;
   onFinished: () => void;
 }) => {
-  const { gl } = useThree();
-
-  const MAX_FRAMES = 60;
-  const FRAME_SKIP = 10;
+  const { gl, scene, camera } = useThree();
 
   const framesRef = useRef<Uint8Array[]>([]);
   const isFinished = useRef(false);
   const frameCounter = useRef(0);
 
+  const renderTarget = useRef<WebGLRenderTarget | null>(null);
+
+  useEffect(() => {
+    renderTarget.current = new WebGLRenderTarget(GIF_WIDTH, GIF_HEIGHT, {
+      minFilter: LinearFilter,
+      magFilter: LinearFilter,
+      format: RGBAFormat,
+      type: UnsignedByteType,
+      stencilBuffer: false,
+      depthBuffer: true,
+    });
+
+    return () => {
+      renderTarget.current?.dispose();
+    };
+  }, []);
+
   useFrame((state) => {
     const { gl, scene, camera } = state;
+
+    gl.setRenderTarget(null);
     gl.render(scene, camera);
 
-    if (recording && framesRef.current.length < MAX_FRAMES) {
-      frameCounter.current++;
-      if (frameCounter.current % FRAME_SKIP !== 0) return;
+    if (recording && !isFinished.current && renderTarget.current) {
+      if (framesRef.current.length < MAX_FRAMES) {
+        frameCounter.current++;
 
-      const expoContext = gl.getContext() as ExpoWebGLRenderingContext;
-      const width = expoContext.drawingBufferWidth;
-      const height = expoContext.drawingBufferHeight;
+        if (frameCounter.current % FRAME_SKIP === 0) {
+          const rt = renderTarget.current;
 
-      const pixels = new Uint8Array(width * height * 4);
-      expoContext.readPixels(
-        0,
-        0,
-        width,
-        height,
-        expoContext.RGBA,
-        expoContext.UNSIGNED_BYTE,
-        pixels,
-      );
+          let originalAspect = 0;
+          const isPerspective = (camera as any).isPerspectiveCamera;
 
-      const flippedPixels = flipPixels(pixels, width, height);
-      framesRef.current.push(flippedPixels);
-    } else if (
-      recording &&
-      framesRef.current.length >= MAX_FRAMES &&
-      !isFinished.current
-    ) {
-      isFinished.current = true;
-      processGif();
-      frameCounter.current = 0;
+          if (isPerspective) {
+            const pCamera = camera as PerspectiveCamera;
+            originalAspect = pCamera.aspect;
+            pCamera.aspect = GIF_WIDTH / GIF_HEIGHT;
+            pCamera.updateProjectionMatrix();
+          }
+
+          gl.setRenderTarget(rt);
+          gl.clear();
+          gl.render(scene, camera);
+
+          const expoContext = gl.getContext() as ExpoWebGLRenderingContext;
+          const pixels = new Uint8Array(GIF_WIDTH * GIF_HEIGHT * 4);
+
+          expoContext.readPixels(
+            0,
+            0,
+            GIF_WIDTH,
+            GIF_HEIGHT,
+            expoContext.RGBA,
+            expoContext.UNSIGNED_BYTE,
+            pixels,
+          );
+
+          gl.setRenderTarget(null);
+
+          if (isPerspective) {
+            const pCamera = camera as PerspectiveCamera;
+            pCamera.aspect = originalAspect;
+            pCamera.updateProjectionMatrix();
+          }
+
+          const flippedPixels = flipPixels(pixels, GIF_WIDTH, GIF_HEIGHT);
+          framesRef.current.push(flippedPixels);
+        }
+      } else {
+        isFinished.current = true;
+        processGif();
+        frameCounter.current = 0;
+      }
     }
   }, 1);
 
@@ -69,18 +118,13 @@ export const GifRecorder = ({
 
       try {
         const gif = GIFEncoder();
-        const { drawingBufferWidth: width, drawingBufferHeight: height } =
-          gl.getContext() as any;
 
         for (let i = 0; i < framesRef.current.length; i++) {
           const frame = framesRef.current[i];
-
           const palette = quantize(frame, 256);
           const index = applyPalette(frame, palette);
-
-          gif.writeFrame(index, width, height, { palette, delay: 60 });
-
-          await new Promise((resolve) => setTimeout(resolve, 1));
+          gif.writeFrame(index, GIF_WIDTH, GIF_HEIGHT, { palette, delay: 100 });
+          await new Promise((resolve) => setTimeout(resolve, 0));
         }
 
         gif.finish();
@@ -91,50 +135,42 @@ export const GifRecorder = ({
           const url = URL.createObjectURL(blob);
           const link = document.createElement("a");
           link.href = url;
-          link.download = "rotation_viewer.gif";
+          link.download = `model-${Date.now()}.gif`;
           document.body.appendChild(link);
           link.click();
           document.body.removeChild(link);
           URL.revokeObjectURL(url);
         } else {
           const base64Gif = Buffer.from(output).toString("base64");
-          // @ts-ignore
-          const cacheFilename = `${FileSystem.cacheDirectory}3d-capture-${Date.now()}.gif`;
+          const filename = `${FileSystem.cacheDirectory}model-${Date.now()}.gif`;
 
-          await FileSystem.writeAsStringAsync(cacheFilename, base64Gif, {
-            // @ts-ignore
-            encoding: "base64",
+          await FileSystem.writeAsStringAsync(filename, base64Gif, {
+            encoding: FileSystem.EncodingType.Base64,
           });
 
           const permission = await MediaLibrary.requestPermissionsAsync();
 
           if (permission.granted) {
             try {
-              const asset = await MediaLibrary.createAssetAsync(cacheFilename);
+              await MediaLibrary.createAssetAsync(filename);
+              Alert.alert("Sucesso", "GIF salvo na galeria!");
 
-              Alert.alert("Sucesso", "GIF salvo na sua galeria!");
-              const isSharingAvailable = await Sharing.isAvailableAsync();
-
-              if (isSharingAvailable) {
-                await Sharing.shareAsync(cacheFilename, {
+              if (await Sharing.isAvailableAsync()) {
+                await Sharing.shareAsync(filename, {
                   mimeType: "image/gif",
-                  dialogTitle: "Compartilhar seu Modelo 3D",
+                  dialogTitle: "Compartilhar Modelo",
                   UTI: "com.compuserve.gif",
                 });
               }
             } catch (e) {
-              console.error("Erro ao salvar na galeria:", e);
-              Alert.alert("Erro", "Não foi possível salvar na galeria.");
+              console.error(e);
+              Alert.alert("Erro", "Falha ao salvar na galeria.");
             }
-          } else {
-            Alert.alert(
-              "Permissão negada",
-              "Precisamos de acesso à galeria para salvar o GIF.",
-            );
           }
         }
       } catch (err) {
-        console.error(err);
+        console.error("Erro na geração do GIF:", err);
+        Alert.alert("Erro", "Falha ao gerar o GIF.");
       } finally {
         framesRef.current = [];
         isFinished.current = false;
@@ -146,14 +182,16 @@ export const GifRecorder = ({
 };
 
 function flipPixels(pixels: Uint8Array, width: number, height: number) {
-  const flipped = new Uint8Array(pixels.length);
-  const rowLength = width * 4;
-  for (let y = 0; y < height; y++) {
-    const targetY = height - 1 - y;
-    flipped.set(
-      pixels.subarray(y * rowLength, (y + 1) * rowLength),
-      targetY * rowLength,
-    );
+  const halfHeight = Math.floor(height / 2);
+  const rowBytes = width * 4;
+  const tempRow = new Uint8Array(rowBytes);
+
+  for (let y = 0; y < halfHeight; y++) {
+    const topOffset = y * rowBytes;
+    const bottomOffset = (height - 1 - y) * rowBytes;
+    tempRow.set(pixels.subarray(topOffset, topOffset + rowBytes));
+    pixels.copyWithin(topOffset, bottomOffset, bottomOffset + rowBytes);
+    pixels.set(tempRow, bottomOffset);
   }
-  return flipped;
+  return pixels;
 }
