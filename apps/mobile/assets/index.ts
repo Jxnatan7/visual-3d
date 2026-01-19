@@ -19,4 +19,4 @@ export const localFonts = {
   MulishBlack: require("./fonts/Mulish-Black.ttf"),
 };
 
-export const localModels = [require("./models/example/ferrari-simple.glb")];
+export const localModels = [require("./models/example/ferrari-light.glb")];

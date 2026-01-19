@@ -6258,7 +6258,7 @@ __metadata:
     expo-image: "npm:~3.0.10"
     expo-linear-gradient: "npm:~15.0.8"
     expo-linking: "npm:~8.0.9"
-    expo-media-library: "npm:^18.2.1"
+    expo-media-library: "npm:~18.2.1"
     expo-router: "npm:~6.0.15"
     expo-secure-store: "npm:~15.0.7"
     expo-sharing: "npm:~14.0.8"
@@ -6268,6 +6268,7 @@ __metadata:
     expo-web-browser: "npm:~15.0.9"
     formik: "npm:^2.4.9"
     gif-encoder-2: "npm:^1.0.5"
+    gifenc: "npm:^1.0.3"
     js-cookie: "npm:^3.0.5"
     lottie-react-native: "npm:~7.3.1"
     meshoptimizer: "npm:^1.0.1"
@@ -6928,7 +6929,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"expo-media-library@npm:^18.2.1":
+"expo-media-library@npm:~18.2.1":
   version: 18.2.1
   resolution: "expo-media-library@npm:18.2.1"
   peerDependencies:
@@ -7739,6 +7740,13 @@ __metadata:
   version: 1.0.5
   resolution: "gif-encoder-2@npm:1.0.5"
   checksum: 10c0/aa40660199243ebde2904b97baf800743d9ed5582a61ab47419c1d04ce53e6389355f4d4a4ae59de5f3ac8cd4a1b4e1ba70ee033da56e1c296516e416c4ee05d
+  languageName: node
+  linkType: hard
+
+"gifenc@npm:^1.0.3":
+  version: 1.0.3
+  resolution: "gifenc@npm:1.0.3"
+  checksum: 10c0/34fc6b2c66c305fc556cd2f475154ce2ad68384a52ceb8253b901c8c7d9c63f2c0a5d109ceb3cb46e44c2c6155009920a286cf08a621105863aa43468e345229
   languageName: node
   linkType: hard
 

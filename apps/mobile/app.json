@@ -35,12 +35,18 @@
       [
         "expo-asset",
         {
-          "assets": [
-            "./assets/images/init-image.png"
-          ]
+          "assets": ["./assets/images/init-image.png"]
         }
       ],
-      "expo-secure-store"
+      "expo-secure-store",
+      [
+        "expo-media-library",
+        {
+          "photosPermission": "Permitir que o app salve gifs na sua galeria.",
+          "savePhotosPermission": "Permitir que o app salve gifs na sua galeria.",
+          "isAccessMediaLocationEnabled": true
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

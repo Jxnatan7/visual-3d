@@ -1,4 +1,4 @@
-import React, { Suspense } from "react";
+import React, { Suspense, useState } from "react";
 import { StyleSheet } from "react-native";
 import { Canvas } from "@react-three/fiber/native";
 import { Center, Environment } from "@react-three/drei/native";
@@ -35,7 +35,7 @@ export const ModelViewer = ({
   backgroundColor = "#121212",
 }: ModelViewerProps) => {
   const controller = useViewerController({ initialRotation, autoRotate });
-  const [isRecording, setIsRecording] = React.useState(false);
+  const [isRecording, setIsRecording] = useState(false);
   const [status, requestPermission] = MediaLibrary.usePermissions();
 
   const handleRecord = async () => {
