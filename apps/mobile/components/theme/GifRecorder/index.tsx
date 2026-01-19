@@ -23,6 +23,9 @@ const GIF_HEIGHT = 1000;
 const MAX_FRAMES = 30;
 const FRAME_SKIP = 4;
 
+const VIEW_ROTATION_SPEED = 0.005;
+const GIF_ADDITIONAL_ROTATION = 0.15;
+
 export const GifRecorder = ({
   recording,
   onFinished,
@@ -35,6 +38,7 @@ export const GifRecorder = ({
   const framesRef = useRef<Uint8Array[]>([]);
   const isFinished = useRef(false);
   const frameCounter = useRef(0);
+  const gifRotationOffset = useRef(0);
 
   const renderTarget = useRef<WebGLRenderTarget | null>(null);
 
@@ -56,6 +60,8 @@ export const GifRecorder = ({
   useFrame((state) => {
     const { gl, scene, camera } = state;
 
+    scene.rotation.y += VIEW_ROTATION_SPEED;
+
     gl.setRenderTarget(null);
     gl.render(scene, camera);
 
@@ -76,9 +82,16 @@ export const GifRecorder = ({
             pCamera.updateProjectionMatrix();
           }
 
+          const originalRotation = scene.rotation.y;
+          gifRotationOffset.current += GIF_ADDITIONAL_ROTATION;
+          scene.rotation.y += gifRotationOffset.current;
+
+          gl.setClearColor(0x000000, 0);
           gl.setRenderTarget(rt);
           gl.clear();
           gl.render(scene, camera);
+
+          scene.rotation.y = originalRotation;
 
           const expoContext = gl.getContext() as ExpoWebGLRenderingContext;
           const pixels = new Uint8Array(GIF_WIDTH * GIF_HEIGHT * 4);
@@ -108,7 +121,10 @@ export const GifRecorder = ({
         isFinished.current = true;
         processGif();
         frameCounter.current = 0;
+        gifRotationOffset.current = 0;
       }
+    } else if (!recording) {
+      gifRotationOffset.current = 0;
     }
   }, 1);
 
@@ -121,9 +137,16 @@ export const GifRecorder = ({
 
         for (let i = 0; i < framesRef.current.length; i++) {
           const frame = framesRef.current[i];
-          const palette = quantize(frame, 256);
-          const index = applyPalette(frame, palette);
-          gif.writeFrame(index, GIF_WIDTH, GIF_HEIGHT, { palette, delay: 100 });
+          const palette = quantize(frame, 256, { format: "rgba4444" });
+          const index = applyPalette(frame, palette, { format: "rgba4444" });
+
+          gif.writeFrame(index, GIF_WIDTH, GIF_HEIGHT, {
+            palette,
+            delay: 100,
+            transparent: true,
+            transparentIndex: 0,
+          });
+
           await new Promise((resolve) => setTimeout(resolve, 0));
         }
 
