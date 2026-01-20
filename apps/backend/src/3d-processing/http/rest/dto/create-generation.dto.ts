@@ -1,8 +1,8 @@
-import { IsEnum, IsOptional, IsUrl } from "class-validator";
+import { IsBase64, IsEnum, IsOptional } from "class-validator";
 
 export class Create3DGenerationDto {
-  @IsUrl()
-  imageUrl: string;
+  @IsBase64()
+  imageBase64: string;
 
   @IsOptional()
   @IsEnum(["standard", "lowpoly"])

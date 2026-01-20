@@ -13,13 +13,16 @@ export class GeneratorService {
 
   async startGeneration(dto: Create3DGenerationDto, userId?: string) {
     const { result: externalId } = await this.aiProvider.createImageTo3D({
-      image_url: dto.imageUrl,
-      model_type: dto.modelType,
+      image_url: `data:image/png;base64,${dto.imageBase64}`,
+      model_type: dto.modelType ?? "standard",
+      target_polycount: 3000,
+      should_texture: true,
+      should_remesh: true,
     });
 
     return this.taskRepository.create({
       externalId,
-      imageUrl: dto.imageUrl,
+      imageUrl: dto.imageBase64,
       userId: userId ? new Types.ObjectId(userId) : undefined,
       status: "PENDING",
     });

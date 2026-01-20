@@ -9,6 +9,7 @@ import { CommunicationRequestModule } from "./communication-request/communicatio
 import { ChatModule } from "./chat/chat.module";
 import { MessageModule } from "./message/message.module";
 import { IntegrationModule } from "./integration/integration.module";
+import { Processing3dModule } from "./3d-processing/3d-processing.module";
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { IntegrationModule } from "./integration/integration.module";
     ChatModule,
     MessageModule,
     IntegrationModule,
+    Processing3dModule,
   ],
   controllers: [],
   providers: [],

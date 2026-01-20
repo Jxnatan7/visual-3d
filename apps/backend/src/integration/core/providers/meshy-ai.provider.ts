@@ -1,4 +1,3 @@
-// src/integration/providers/meshy-ai.provider.ts
 import { Injectable } from "@nestjs/common";
 import { HttpService } from "@nestjs/axios";
 import { ConfigService } from "@nestjs/config";
@@ -16,8 +15,7 @@ export class MeshyAIProvider extends BaseApiProvider implements IAIProvider {
     private readonly configService: ConfigService,
   ) {
     const baseUrl =
-      configService.get<string>("MESHY_AI_URL") ||
-      "https://api.meshy.ai/openapi/v1";
+      process.env.MESHY_API_URL || "https://api.meshy.ai/openapi/v1";
     super(httpService, baseUrl);
   }
 

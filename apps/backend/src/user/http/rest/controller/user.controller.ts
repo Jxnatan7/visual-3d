@@ -15,7 +15,7 @@ import { AdminGuard } from "src/auth/guards/admin.guard";
 import { JwtAuthGuard } from "src/auth/guards/jwt-auth.guard";
 import { Public } from "src/decorators/public.decorator";
 
-@Controller("api/users")
+@Controller("api/v1/users")
 @UseGuards(JwtAuthGuard)
 export class UserController {
   constructor(private readonly userService: UserService) {}

@@ -14,7 +14,7 @@ import {
 import { MessageDocument } from "src/message/core/schemas/message.schema";
 import { MessageService } from "src/message/core/services/message.service";
 
-@Controller("api/messages")
+@Controller("api/v1/messages")
 export class MessageController {
   constructor(private readonly messageService: MessageService) {}
 

@@ -19,7 +19,7 @@ import {
 import { CommunicationRequest } from "src/communication-request/core/schemas/communication-request.schema";
 
 @UseGuards(JwtAuthGuard)
-@Controller("api/communication-requests")
+@Controller("api/v1/communication-requests")
 export class CommunicationRequestController {
   constructor(
     private readonly communicationRequestService: CommunicationRequestService,
