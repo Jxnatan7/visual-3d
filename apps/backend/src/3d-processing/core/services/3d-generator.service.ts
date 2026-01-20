@@ -2,13 +2,13 @@ import { Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { Types } from "mongoose";
 import { Create3DGenerationDto } from "src/3d-processing/http/rest/dto/create-generation.dto";
 import { IAIProvider } from "src/integration/core/interfaces/ai-provider.interface";
-import { TaskRepository } from "src/integration/core/repositories/task.repository";
+import { Model3DRepository } from "src/integration/core/repositories/model-3d.repository";
 
 @Injectable()
 export class GeneratorService {
   constructor(
     @Inject("AI_PROVIDER") private readonly aiProvider: IAIProvider,
-    private readonly taskRepository: TaskRepository,
+    private readonly model3DRepository: Model3DRepository,
   ) {}
 
   async startGeneration(dto: Create3DGenerationDto, userId?: string) {
@@ -20,7 +20,7 @@ export class GeneratorService {
       should_remesh: true,
     });
 
-    return this.taskRepository.create({
+    return this.model3DRepository.create({
       externalId,
       imageUrl: dto.imageBase64,
       userId: userId ? new Types.ObjectId(userId) : undefined,
@@ -28,8 +28,8 @@ export class GeneratorService {
     });
   }
 
-  async getInternalTaskStatus(taskId: string) {
-    const task = await this.taskRepository.findByExternalId(taskId);
+  async getInternalModel3DTaskStatus(taskId: string) {
+    const task = await this.model3DRepository.findByExternalId(taskId);
     if (!task) throw new NotFoundException("Task not found");
     return task;
   }

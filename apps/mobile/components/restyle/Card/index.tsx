@@ -18,7 +18,7 @@ import type { Theme } from "@/theme";
 import { Box } from "../Box";
 
 const cardVariant = createVariant<Theme>({
-  themeKey: "containerVariants",
+  themeKey: "cardVariants",
   property: "variant",
 });
 
@@ -27,10 +27,10 @@ type RestyleProps = SpacingProps<Theme> &
   BackgroundColorProps<Theme> &
   BorderProps<Theme> &
   ColorProps<Theme> &
-  VariantProps<Theme, "containerVariants"> &
+  VariantProps<Theme, "cardVariants"> &
   TouchableOpacityProps;
 
-export const RestyleContainer = createRestyleComponent<RestyleProps, Theme>(
+export const RestyleCard = createRestyleComponent<RestyleProps, Theme>(
   [
     spacing,
     layout,
@@ -42,6 +42,4 @@ export const RestyleContainer = createRestyleComponent<RestyleProps, Theme>(
   Box,
 );
 
-export type RestyleContainerProps = React.ComponentProps<
-  typeof RestyleContainer
->;
+export type RestyleCardProps = React.ComponentProps<typeof RestyleCard>;

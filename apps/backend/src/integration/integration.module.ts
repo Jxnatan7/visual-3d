@@ -2,24 +2,24 @@ import { HttpModule } from "@nestjs/axios";
 import { Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
 import { MeshyAIProvider } from "./core/providers/meshy-ai.provider";
-import { Task, TaskSchema } from "./core/schemas/task.schema";
-import { TaskRepository } from "./core/repositories/task.repository";
-import { TaskUpdatedListener } from "src/3d-processing/core/listener/task-updated.listener";
+import { Model3DRepository } from "./core/repositories/model-3d.repository";
+import { Model3dUpdatedListener } from "src/3d-processing/core/listener/model-3d-updated.listener";
+import { Model3D, ModelSchema } from "./core/schemas/model-3d.schema";
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: Task.name, schema: TaskSchema }]),
+    MongooseModule.forFeature([{ name: Model3D.name, schema: ModelSchema }]),
     HttpModule,
   ],
   providers: [
-    TaskRepository,
-    TaskUpdatedListener,
+    Model3DRepository,
+    Model3dUpdatedListener,
     MeshyAIProvider,
     {
       provide: "AI_PROVIDER",
       useClass: MeshyAIProvider,
     },
   ],
-  exports: [TaskRepository, "AI_PROVIDER"],
+  exports: [Model3DRepository, "AI_PROVIDER"],
 })
 export class IntegrationModule {}

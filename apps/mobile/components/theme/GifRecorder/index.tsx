@@ -1,5 +1,5 @@
 import { useRef, useEffect } from "react";
-import { useThree, useFrame } from "@react-three/fiber/native";
+import { useFrame } from "@react-three/fiber/native";
 import { ExpoWebGLRenderingContext } from "expo-gl";
 import { Buffer } from "buffer";
 import * as FileSystem from "expo-file-system/legacy";
@@ -18,13 +18,13 @@ import {
 
 global.Buffer = global.Buffer || Buffer;
 
-const GIF_WIDTH = 1000;
-const GIF_HEIGHT = 1000;
+const GIF_WIDTH = 2000;
+const GIF_HEIGHT = 2000;
 const MAX_FRAMES = 30;
 const FRAME_SKIP = 4;
 
 const VIEW_ROTATION_SPEED = 0.005;
-const GIF_ADDITIONAL_ROTATION = 0.15;
+const GIF_ADDITIONAL_ROTATION = 0.1;
 
 export const GifRecorder = ({
   recording,
@@ -33,8 +33,6 @@ export const GifRecorder = ({
   recording: boolean;
   onFinished: () => void;
 }) => {
-  const { gl, scene, camera } = useThree();
-
   const framesRef = useRef<Uint8Array[]>([]);
   const isFinished = useRef(false);
   const frameCounter = useRef(0);

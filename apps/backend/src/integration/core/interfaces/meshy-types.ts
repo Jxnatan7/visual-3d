@@ -32,6 +32,7 @@ export interface MeshyTaskResponse {
   type: string;
   status: MeshyStatus;
   progress: number;
+
   model_urls?: {
     glb?: string;
     fbx?: string;
@@ -39,6 +40,24 @@ export interface MeshyTaskResponse {
     usdz?: string;
     pre_remeshed_glb?: string;
   };
+
   thumbnail_url?: string;
-  task_error?: { message: string };
+  texture_prompt?: string;
+
+  texture_urls?: Array<{
+    base_color?: string;
+    metallic?: string;
+    normal?: string;
+    roughness?: string;
+  }>;
+
+  started_at?: number;
+  created_at: number;
+  expires_at?: number;
+  finished_at?: number;
+
+  preceding_tasks?: number;
+  task_error?: {
+    message: string;
+  };
 }

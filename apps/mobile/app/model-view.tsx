@@ -1,13 +1,13 @@
+import { Box } from "@/components/restyle";
 import Model from "@/components/theme/Model";
 import { ModelViewer } from "@/components/theme/MovelViewer";
-import { View } from "react-native";
 
-export default function Example() {
+export default function ModelView() {
   return (
-    <View style={{ flex: 1 }}>
+    <Box style={{ flex: 1 }}>
       <ModelViewer>
         <Model />
       </ModelViewer>
-    </View>
+    </Box>
   );
 }

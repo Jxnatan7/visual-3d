@@ -1,14 +1,14 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { OnEvent } from "@nestjs/event-emitter";
 import { MeshyTaskResponse } from "src/integration/core/interfaces/meshy-types";
-import { TaskRepository } from "src/integration/core/repositories/task.repository";
-import { Task } from "src/integration/core/schemas/task.schema";
+import { Model3DRepository } from "src/integration/core/repositories/model-3d.repository";
+import { Model3D } from "src/integration/core/schemas/model-3d.schema";
 
 @Injectable()
-export class TaskUpdatedListener {
-  private readonly logger = new Logger(TaskUpdatedListener.name);
+export class Model3dUpdatedListener {
+  private readonly logger = new Logger(Model3dUpdatedListener.name);
 
-  constructor(private readonly taskRepo: TaskRepository) {}
+  constructor(private readonly taskRepo: Model3DRepository) {}
 
   @OnEvent("3d.task.updated")
   async handleTaskUpdate(payload: MeshyTaskResponse) {
@@ -16,17 +16,8 @@ export class TaskUpdatedListener {
       `Recebendo atualização da Task: ${payload.id} - Status: ${payload.status}`,
     );
 
-    const updateData: Partial<Task> = {
-      status: payload.status,
-      thumbnailUrl: payload.thumbnail_url,
-      modelUrls: payload.model_urls
-        ? {
-            glb: payload.model_urls.glb,
-            fbx: payload.model_urls.fbx,
-            obj: payload.model_urls.obj,
-            usdz: payload.model_urls.usdz,
-          }
-        : undefined,
+    const updateData: Partial<Model3D> = {
+      ...payload,
       rawMetadata: payload,
     };
 

@@ -13,6 +13,6 @@ export class GeneratorController {
 
   @Get(":id")
   async getStatus(@Param("id") id: string) {
-    return this.generatorService.getInternalTaskStatus(id);
+    return this.generatorService.getInternalModel3DTaskStatus(id);
   }
 }

@@ -46,7 +46,7 @@ export const ActionModal = ({
           width="100%"
           maxWidth={450}
           backgroundColor="backgroundLight"
-          borderRadius={8}
+          borderRadius="l"
           p="l"
           elevation={5}
           shadowColor="textGray"
@@ -54,12 +54,7 @@ export const ActionModal = ({
           shadowOpacity={0.25}
           shadowRadius={3.84}
         >
-          <Text
-            variant="containerHeader"
-            color="textLight"
-            textAlign="center"
-            mb="s"
-          >
+          <Text variant="subHeader" color="textLight" textAlign="center" mb="s">
             {title}
           </Text>
 
@@ -98,18 +93,17 @@ export const ActionModal = ({
               style={[
                 styles.buttonBase,
                 {
-                  backgroundColor:
-                    theme.colors.buttonBackgroundLight || "#007BFF",
+                  backgroundColor: theme.colors.buttonBackground || "#007BFF",
                 },
               ]}
             >
-              {loading ? (
+              {/* {loading ? (
                 <ActivityIndicator color="#FFF" size="small" />
               ) : (
                 <Text variant="button" color="buttonTextLight" fontSize={16}>
                   {confirmText}
                 </Text>
-              )}
+              )} */}
             </RestylePressable>
           </Box>
 

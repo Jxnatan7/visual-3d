@@ -67,9 +67,12 @@ export const ModelViewer = ({
 
       <Box position="absolute" top={100} alignSelf="center" zIndex={10}>
         <Button
+          variant="default"
           text={isRecording ? "Recording..." : "Create GIF"}
           onPress={handleRecord}
           disabled={isRecording}
+          width="auto"
+          padding="m"
         />
       </Box>
 

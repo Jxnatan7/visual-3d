@@ -24,7 +24,7 @@ export class MeshyAIProvider extends BaseApiProvider implements IAIProvider {
     path: string,
     data?: any,
   ): Promise<T> {
-    const apiKey = this.configService.get<string>("MESHY_API_KEY");
+    const apiKey = process.env.MESHY_API_KEY;
 
     const config = {
       headers: {

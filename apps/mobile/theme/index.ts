@@ -16,7 +16,7 @@ const lightColors = {
 
 const darkColors: typeof lightColors = {
   ...pallete,
-  mainBackground: pallete.backgroundDark,
+  mainBackground: pallete.black,
   mainTitle: pallete.titleDark,
   mainText: pallete.textDark,
   buttonBackground: pallete.buttonBackgroundDark,
@@ -39,14 +39,27 @@ const theme = createTheme({
     none: 0,
     xs: 4,
     s: 6,
+    sm: 10,
     m: 16,
+    ml: 20,
     l: 24,
     xl: 40,
     xxl: 64,
     xxxl: 80,
     xxxxl: 120,
+    minus: -10,
   },
   imageVariants: {
+    model: {
+      width: {
+        smallPhone: 150,
+        phone: 150,
+      },
+      height: {
+        smallPhone: 150,
+        phone: 150,
+      },
+    },
     default: {
       width: 40,
       height: 40,
@@ -229,6 +242,11 @@ const theme = createTheme({
     },
   },
   textVariants: {
+    subHeader: {
+      color: "mainText",
+      fontFamily: "MulishFontMedium",
+      fontSize: 18,
+    },
     "label-error": {
       width: "100%",
       fontFamily: "MulishFont",
@@ -399,6 +417,12 @@ const theme = createTheme({
       width: "100%",
       maxHeight: 800,
     },
+    default: {
+      backgroundColor: "backgroundLight",
+      width: "100%",
+      maxWidth: 450,
+      maxHeight: 800,
+    },
     defaults: {
       backgroundColor: "backgroundLight",
       width: "100%",
@@ -410,6 +434,12 @@ const theme = createTheme({
       backgroundColor: "transparent",
       height: 40,
       maxHeight: 40,
+    },
+    models: {
+      flex: 1,
+      maxWidth: "100%",
+      backgroundColor: "transparent",
+      marginTop: "m",
     },
   },
   cameraVariants: {
@@ -429,6 +459,41 @@ const theme = createTheme({
     red: ["finish", "finish"],
     default: ["gradientLight0", "gradientLight1"],
     transparent: ["transparent", "transparent"],
+  },
+  cardVariants: {
+    header: {
+      width: "100%",
+      backgroundColor: "gray600",
+      borderRadius: 8,
+      p: "s",
+    },
+    default: {
+      backgroundColor: "backgroundLight",
+      borderRadius: 8,
+    },
+    defaults: {
+      backgroundColor: "backgroundLight",
+      borderRadius: 8,
+    },
+    transparent: {
+      backgroundColor: "transparent",
+      borderRadius: 8,
+    },
+    primary: {
+      backgroundColor: "buttonGradientPrimary1",
+      borderRadius: 8,
+    },
+    secondary: {
+      backgroundColor: "buttonGradientSecondary1",
+      borderRadius: 8,
+    },
+    model: {
+      backgroundColor: "allBlack",
+      borderRadius: 8,
+      marginHorizontal: "s",
+      justifyContent: "center",
+      alignItems: "center",
+    },
   },
 });
 
