@@ -9,17 +9,17 @@ export type PaginatedResult<T> = {
   totalPages: number;
 };
 
-interface PaginatedFlashListProps<T> extends Omit<
+export type PaginatedFlashListProps<T> = Omit<
   RestyleFlashListProps,
   "data" | "extraData"
-> {
+> & {
   fetchData: (
     page: number,
-    pageSize: number
+    pageSize: number,
   ) => Promise<PaginatedResult<T> | undefined>;
   pageSize?: number;
   ListEmptyComponent?: React.JSX.Element;
-}
+};
 
 export function PaginatedFlashList<T>({
   fetchData,
@@ -71,13 +71,13 @@ export function PaginatedFlashList<T>({
         setIsFirstLoad(false);
       }
     },
-    [pageSize]
+    [pageSize],
   );
 
   useFocusEffect(
     useCallback(() => {
       loadData(1, true);
-    }, [loadData])
+    }, [loadData]),
   );
 
   const handleRefresh = () => {

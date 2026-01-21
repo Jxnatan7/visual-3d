@@ -75,7 +75,7 @@ export const ModelViewer = ({
           zIndex={20}
           justifyContent="center"
           alignItems="center"
-          style={{ backgroundColor: "rgba(0,0,0,0.6)" }}
+          style={{ backgroundColor: "rgba(0,0,0,0.6)", margin: -20 }}
         >
           <ActivityIndicator size="large" color="#ffffff" />
         </Box>

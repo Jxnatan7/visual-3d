@@ -41,4 +41,8 @@ export class Model3DRepository {
       .sort({ createdAt: -1 })
       .exec();
   }
+
+  getModel() {
+    return this.model3DModel;
+  }
 }

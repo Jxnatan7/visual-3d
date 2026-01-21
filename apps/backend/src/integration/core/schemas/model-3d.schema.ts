@@ -28,7 +28,7 @@ class ModelUrls {
   preRemeshedGlb?: string;
 }
 
-@Schema({ timestamps: true, collection: "ai_models" })
+@Schema({ timestamps: true, collection: "models_3d" })
 export class Model3D extends Document {
   @Prop({ required: true, index: true })
   externalId: string;
