@@ -5,16 +5,19 @@ import { Text } from "@/components/restyle";
 import Button from "@/components/theme/Button";
 import { Form, FormTextInput, FormButton } from "@/components/theme/Form";
 import { loginFormValidation } from "@/utils/schemaValidation";
-import { useAuthActions } from "@/contexts/AuthProvider";
+import { useAuthActions, useUser } from "@/contexts/AuthProvider";
 
 export default function Login() {
+  const user = useUser();
   const { replace, push } = useRouter();
   const { login } = useAuthActions();
 
   const onSubmit = (values: any, { setFieldError }: any) => {
+    const cleanPhone = values.phone.replace(/\D/g, "");
+
     try {
-      login(values.email, values.password).then(() => {
-        replace("/(tabs)/user");
+      login(cleanPhone, values.password).then(() => {
+        replace("/");
       });
     } catch (err: any) {
       const message = "Erro ao realizar login.";
@@ -22,29 +25,35 @@ export default function Login() {
     }
   };
 
+  if (user) {
+    replace("/");
+  }
+
   return (
     <Container
       variant="screen"
-      containerHeaderProps={{ backButtonFallback: () => push("/init") }}
+      containerHeaderProps={{ backButtonFallback: () => push("/") }}
     >
       <Text variant="header" mt="xxxl">
         Faça o seu Login
       </Text>
 
       <Form
-        initialValues={{ email: "", password: "" }}
+        initialValues={{ phone: "", password: "" }}
         validate={loginFormValidation}
         onSubmit={onSubmit}
         containerProps={{ marginTop: "xxl" }}
       >
         <FormTextInput
-          name="email"
-          label="E-mail"
-          placeholder="seu-melhor@emai.com"
-          keyboardType="email-address"
-          autoFocus
-          containerProps={{ paddingHorizontal: "m" }}
+          name="phone"
+          marginTop="m"
+          placeholder="Telefone"
+          keyboardType="numeric"
+          autoCapitalize="none"
+          mask="phone"
+          containerProps={{ marginTop: "m", paddingHorizontal: "m" }}
         />
+
         <FormTextInput
           name="password"
           placeholder="*********"

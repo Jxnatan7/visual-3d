@@ -12,22 +12,33 @@ export type RegisterResponse = {
 };
 
 export const AuthService = {
-  login: async (email: string, password: string) => {
+  login: async (phone: string, password: string) => {
     const { data } = await axiosClient.post<LoginResponse>("/auth/login", {
-      email,
+      phone,
       password,
     });
     return data;
   },
 
-  register: async (name: string, email: string, password: string) => {
+  register: async ({
+    name,
+    email,
+    phone,
+    password,
+  }: {
+    name: string;
+    email?: string;
+    phone: string;
+    password: string;
+  }) => {
     const { data } = await axiosClient.post<RegisterResponse>(
       "/auth/register",
       {
         name,
         email,
         password,
-      }
+        phone,
+      },
     );
     return data;
   },

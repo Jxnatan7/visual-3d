@@ -3,6 +3,7 @@ import { Formik, FormikConfig, FormikValues, useFormikContext } from "formik";
 import { Box, BoxProps, Text } from "@/components/restyle";
 import { TextInput } from "@/components/theme/TextInput";
 import Button from "@/components/theme/Button";
+import { maskPhone } from "@/utils/masks";
 
 type FormProps<T extends FormikValues> = FormikConfig<T> & {
   children: React.ReactNode;
@@ -27,20 +28,40 @@ export function Form<T extends FormikValues>({
 
 type FormInputProps = React.ComponentProps<typeof TextInput> & {
   name: string;
+  mask?: "phone";
 };
 
-export function FormTextInput({ name, ...rest }: FormInputProps) {
-  const { handleChange, handleBlur, values, errors, touched, isSubmitting } =
+export function FormTextInput({
+  name,
+  mask,
+  onChangeText,
+  ...rest
+}: FormInputProps) {
+  const { setFieldValue, handleBlur, values, errors, touched, isSubmitting } =
     useFormikContext<any>();
 
   const errorMessage =
     touched[name] && errors[name] ? (errors[name] as string) : null;
 
+  const handleChangeText = (text: string) => {
+    let formattedText = text;
+
+    if (mask === "phone") {
+      formattedText = maskPhone(text);
+    }
+
+    setFieldValue(name, formattedText);
+
+    if (onChangeText) {
+      onChangeText(formattedText);
+    }
+  };
+
   return (
     <>
       <TextInput
         value={values[name]}
-        onChangeText={handleChange(name)}
+        onChangeText={handleChangeText}
         onBlur={handleBlur(name)}
         editable={!isSubmitting}
         {...rest}

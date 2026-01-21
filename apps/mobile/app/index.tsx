@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Dimensions } from "react-native";
 import { RestyleContainer } from "@/components/restyle/Container";
 import { Box, RestyleFlatList, Text } from "@/components/restyle";
@@ -7,6 +7,8 @@ import { IconButton } from "@/components/theme/IconButton";
 import { MaterialIcons } from "@expo/vector-icons";
 import { ModelImage } from "@/components/theme/ModelImage";
 import { useRouter } from "expo-router";
+import { useAuthActions, useUser } from "@/contexts/AuthProvider";
+import { ActionModal } from "@/components/theme/ActionModal";
 
 const MOCK_DATA = [
   {
@@ -79,8 +81,12 @@ const MOCK_DATA = [
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
 export default function DashboardScreen() {
+  const user = useUser();
+  const { logout } = useAuthActions();
   const { push } = useRouter();
+  const [openModal, setOpenModal] = useState(false);
   const CARD_WIDTH = (SCREEN_WIDTH - 56) / 2;
+
   return (
     <RestyleContainer
       variant="screen"
@@ -108,28 +114,22 @@ export default function DashboardScreen() {
             Create 3D Models
           </Text>
         </Box>
-        <Box flexDirection="row">
-          <IconButton
-            icon={
-              <MaterialIcons name="notifications-none" size={28} color="#fff" />
-            }
-          />
-          <IconButton
-            icon={
-              <Box
-                width={32}
-                height={32}
-                borderRadius={10}
-                backgroundColor="backgroundDark"
-                alignItems="center"
-                justifyContent="center"
-                marginLeft="s"
-              >
-                <MaterialIcons name="person" size={20} color="#fff" />
-              </Box>
-            }
-          />
-        </Box>
+        <IconButton
+          onPress={() => (user ? setOpenModal(true) : push("/login"))}
+          icon={
+            <Box
+              width={32}
+              height={32}
+              borderRadius={10}
+              backgroundColor="backgroundDark"
+              alignItems="center"
+              justifyContent="center"
+              marginLeft="s"
+            >
+              <MaterialIcons name="person" size={20} color="#fff" />
+            </Box>
+          }
+        />
       </RestyleCard>
 
       <Box flexDirection="row" justifyContent="flex-start" width="100%" mt="l">
@@ -187,6 +187,18 @@ export default function DashboardScreen() {
           paddingHorizontal: 16,
           paddingBottom: 40,
         }}
+      />
+      <ActionModal
+        visible={openModal}
+        onClose={() => setOpenModal(false)}
+        title="Aura3D"
+        description="Deseja realmente encerrar a sessão?"
+        onConfirm={() => {
+          logout();
+          setOpenModal(false);
+          push("/login");
+        }}
+        confirmText="Sair da conta"
       />
     </RestyleContainer>
   );

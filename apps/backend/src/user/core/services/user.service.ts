@@ -7,7 +7,6 @@ import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import { User, UserRole } from "../schemas/user.schema";
 import { CreateUserDto } from "src/user/http/rest/dto/create-user.dto";
-import { generateCode } from "src/helpers/generateCode";
 
 @Injectable()
 export class UserService {
@@ -16,22 +15,19 @@ export class UserService {
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
-    await this.ensureEmailIsUnique(createUserDto.email);
-    const code = await this.getUniqueCode();
+    if (createUserDto.phone) {
+      await this.ensurePhoneIsUnique(createUserDto.phone);
+    }
+    if (createUserDto.email) {
+      await this.ensureEmailIsUnique(createUserDto.email);
+    }
 
     const user = new this.userModel({
       ...createUserDto,
-      code,
       role: UserRole.USER,
     });
 
     return user.save();
-  }
-
-  private async getUniqueCode(): Promise<string> {
-    const code = generateCode();
-    const existingUser = await this.findByCode(code);
-    return existingUser ? this.getUniqueCode() : code;
   }
 
   async findAll(): Promise<User[]> {
@@ -42,16 +38,12 @@ export class UserService {
     return this.userModel.findOne({ email }).exec();
   }
 
-  async findById(id: string): Promise<User> {
-    const user = await this.userModel.findById(id).exec();
-    if (!user) {
-      throw new NotFoundException("User not found");
-    }
-    return user;
+  async findByPhone(phone: string): Promise<User | null> {
+    return this.userModel.findOne({ phone }).exec();
   }
 
-  async findByCode(code: string): Promise<User | null> {
-    const user = this.userModel.findOne({ code }).exec();
+  async findById(id: string): Promise<User> {
+    const user = await this.userModel.findById(id).exec();
     if (!user) {
       throw new NotFoundException("User not found");
     }
@@ -67,5 +59,12 @@ export class UserService {
 
   async update(id: string, payload: CreateUserDto): Promise<User | null> {
     return this.userModel.findByIdAndUpdate(id, payload, { new: true });
+  }
+
+  private async ensurePhoneIsUnique(phone: string): Promise<void> {
+    const userExists = await this.findByPhone(phone);
+    if (userExists) {
+      throw new ConflictException("Phone is already in use");
+    }
   }
 }

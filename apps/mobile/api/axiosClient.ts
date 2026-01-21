@@ -4,9 +4,9 @@ import { useCommunicationRequestStore } from "@/stores/communicationRequestStore
 import { Platform } from "react-native";
 
 const mobileBaseURL =
-  `${process.env.EXPO_PUBLIC_API_URL}/api` || "http://localhost:3001/api";
+  `${process.env.EXPO_PUBLIC_API_URL}/api/v1` || "http://localhost:3001/api/v1";
 
-const webBaseUrl = "http://localhost:3001/api";
+const webBaseUrl = "http://localhost:3001/api/v1";
 
 const baseURL = Platform.OS === "web" ? webBaseUrl : mobileBaseURL;
 
@@ -29,7 +29,7 @@ axiosClient.interceptors.request.use(
 
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => Promise.reject(error),
 );
 
 axiosClient.interceptors.response.use(
@@ -39,7 +39,7 @@ axiosClient.interceptors.response.use(
       useAuthStore.getState().logout();
     }
     return Promise.reject(error);
-  }
+  },
 );
 
 export default axiosClient;

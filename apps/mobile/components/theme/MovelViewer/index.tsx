@@ -1,5 +1,5 @@
 import React, { Suspense, useState } from "react";
-import { StyleSheet } from "react-native";
+import { ActivityIndicator, StyleSheet } from "react-native";
 import { Canvas } from "@react-three/fiber/native";
 import { Center, Environment } from "@react-three/drei/native";
 import { Box } from "@/components/restyle";
@@ -54,7 +54,7 @@ export const ModelViewer = ({
         performance={{ min: 0.5 }}
       >
         <Suspense fallback={null}>
-          <Environment preset="city" />
+          <Environment preset="dawn" />
           <InteractiveStage controller={controller}>
             <Center>{children}</Center>
           </InteractiveStage>
@@ -64,6 +64,22 @@ export const ModelViewer = ({
           />
         </Suspense>
       </Canvas>
+
+      {isRecording && (
+        <Box
+          position="absolute"
+          top={0}
+          left={0}
+          right={0}
+          bottom={0}
+          zIndex={20}
+          justifyContent="center"
+          alignItems="center"
+          style={{ backgroundColor: "rgba(0,0,0,0.6)" }}
+        >
+          <ActivityIndicator size="large" color="#ffffff" />
+        </Box>
+      )}
 
       <Box position="absolute" top={100} alignSelf="center" zIndex={10}>
         <Button
@@ -88,6 +104,10 @@ export const ModelViewer = ({
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
+  container: {
+    flex: 1,
+    width: "100%",
+    height: "100%",
+  },
   canvas: { flex: 1 },
 });

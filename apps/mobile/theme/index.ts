@@ -104,8 +104,7 @@ const theme = createTheme({
       flex: 1,
       p: "m",
       pt: "xl",
-      alignItems: "center",
-      backgroundColor: "transparent",
+      backgroundColor: "mainBackground",
     },
   },
   boxVariants: {

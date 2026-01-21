@@ -27,11 +27,12 @@ export type AuthState = {
   _hasHydrated: boolean;
   setHasHydrated: (state: boolean) => void;
 
-  login: (email: string, password: string) => Promise<void>;
+  login: (phone: string, password: string) => Promise<void>;
   register: (payload: {
     name: string;
-    email: string;
+    email?: string;
     password: string;
+    phone: string;
   }) => Promise<void>;
   logout: () => void;
   clearError: () => void;
@@ -57,10 +58,10 @@ export const useAuthStore = create<AuthState>()(
       _hasHydrated: false,
       setHasHydrated: (state: boolean) => set({ _hasHydrated: state }),
 
-      login: async (email, password) => {
+      login: async (phone, password) => {
         set({ isLoading: true, error: null });
         try {
-          const data = await AuthService.login(email, password);
+          const data = await AuthService.login(phone, password);
           set({
             token: data.token,
             user: data.user,
@@ -76,20 +77,22 @@ export const useAuthStore = create<AuthState>()(
         }
       },
 
-      register: async ({ name, email, password }) => {
+      register: async ({ name, email, phone, password }) => {
         set({ isLoading: true, error: null });
         try {
-          AuthService.register(name, email, password).then(({ user: data }) => {
-            set({
-              token: data.token,
-              user: {
-                ...data,
-                id: data._id,
-              },
-              isAuthenticated: true,
-              isLoading: false,
-            });
-          });
+          AuthService.register({ name, email, password, phone }).then(
+            ({ user: data }) => {
+              set({
+                token: data.token,
+                user: {
+                  ...data,
+                  id: data._id,
+                },
+                isAuthenticated: true,
+                isLoading: false,
+              });
+            },
+          );
         } catch (error: any) {
           set({
             error: error.response?.data?.message || "Falha no cadastro",
@@ -113,6 +116,6 @@ export const useAuthStore = create<AuthState>()(
       onRehydrateStorage: () => (state) => {
         state?.setHasHydrated(true);
       },
-    }
-  )
+    },
+  ),
 );

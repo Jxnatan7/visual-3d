@@ -46,7 +46,7 @@ export const ActionModal = ({
           width="100%"
           maxWidth={450}
           backgroundColor="backgroundLight"
-          borderRadius="l"
+          borderRadius={8}
           p="l"
           elevation={5}
           shadowColor="textGray"
@@ -97,13 +97,13 @@ export const ActionModal = ({
                 },
               ]}
             >
-              {/* {loading ? (
+              {loading ? (
                 <ActivityIndicator color="#FFF" size="small" />
               ) : (
                 <Text variant="button" color="buttonTextLight" fontSize={16}>
                   {confirmText}
                 </Text>
-              )} */}
+              )}
             </RestylePressable>
           </Box>
 

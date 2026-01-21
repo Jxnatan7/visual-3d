@@ -35,7 +35,7 @@ export default function AwaitingValidation() {
 
   const backButtonFallback = () => {
     store.clearAppData();
-    replace("/init");
+    replace("/");
   };
 
   useEffect(() => {
@@ -45,7 +45,7 @@ export default function AwaitingValidation() {
         animationRef.current.play();
         wait(3300).then(() => {
           replace({
-            pathname: "/chat",
+            pathname: "/",
             params: {
               chatId: useAppStore.getState().chatId,
               blockBack: "true",

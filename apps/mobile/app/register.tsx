@@ -4,23 +4,30 @@ import { Container } from "@/components/theme/Container";
 import { useRouter } from "expo-router";
 import { Form, FormTextInput, FormButton } from "@/components/theme/Form";
 import { registerFormValidation } from "@/utils/schemaValidation";
-import { useAuthActions } from "@/contexts/AuthProvider";
+import { useAuthActions, useUser } from "@/contexts/AuthProvider";
 
 export default function Register() {
+  const user = useUser();
   const { replace, push } = useRouter();
   const { register } = useAuthActions();
 
   const onSubmit = async (
-    values: { name: string; email: string; password: string },
-    { setSubmitting, setFieldError }: any
+    values: { name: string; email: string; password: string; phone: string },
+    { setSubmitting, setFieldError }: any,
   ) => {
     setSubmitting(true);
+
+    const cleanPhone = values.phone.replace(/\D/g, "");
+
     try {
-      register({
+      await register({
         name: values.name,
+        phone: cleanPhone,
         email: values.email,
         password: values.password,
-      }).then(() => replace("/(tabs)"));
+      });
+
+      replace("/");
     } catch (err: any) {
       const message = "Erro ao realizar cadastro. Verifique suas credenciais.";
       setFieldError("password", message);
@@ -28,6 +35,10 @@ export default function Register() {
       setSubmitting(false);
     }
   };
+
+  if (user) {
+    replace("/");
+  }
 
   return (
     <Container
@@ -39,7 +50,7 @@ export default function Register() {
       </Text>
 
       <Form
-        initialValues={{ name: "", email: "", password: "" }}
+        initialValues={{ name: "", email: "", password: "", phone: "" }}
         validate={registerFormValidation}
         onSubmit={onSubmit}
       >
@@ -52,11 +63,12 @@ export default function Register() {
         />
 
         <FormTextInput
-          name="email"
+          name="phone"
           marginTop="m"
-          placeholder="E-mail"
-          keyboardType="email-address"
+          placeholder="Telefone"
+          keyboardType="numeric"
           autoCapitalize="none"
+          mask="phone"
         />
 
         <FormTextInput

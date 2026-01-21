@@ -13,7 +13,6 @@ import { CreateUserDto } from "../dto/create-user.dto";
 import { SimpleUser } from "../dto/simple-user.dto";
 import { AdminGuard } from "src/auth/guards/admin.guard";
 import { JwtAuthGuard } from "src/auth/guards/jwt-auth.guard";
-import { Public } from "src/decorators/public.decorator";
 
 @Controller("api/v1/users")
 @UseGuards(JwtAuthGuard)
@@ -31,16 +30,6 @@ export class UserController {
   @Get("/:id")
   async findById(@Param("id") id: string) {
     return this.userService.findById(id);
-  }
-
-  @HttpCode(200)
-  @Public()
-  @Get("code/:code")
-  async findByCode(@Param("code") code: string) {
-    const user = await this.userService.findByCode(code);
-    if (user) {
-      return SimpleUser.createFromUser(user);
-    }
   }
 
   @Put("/:id")

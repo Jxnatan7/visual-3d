@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Document, Types } from "mongoose";
+import { Document } from "mongoose";
 import { hashSync } from "bcrypt";
 import * as jwt from "jsonwebtoken";
 import { convertTime } from "src/helpers/convertTime";
@@ -15,23 +15,17 @@ export class User extends Document {
   @Prop({ required: true })
   name: string;
 
-  @Prop()
+  @Prop({ unique: true })
   email: string;
 
-  @Prop()
+  @Prop({ required: true, unique: true })
   phone: string;
 
   @Prop()
   password: string;
 
-  @Prop()
-  code: string;
-
   @Prop({ required: true, enum: UserRole })
   role: UserRole;
-
-  @Prop({ type: Types.ObjectId, ref: "CommunicationRequest" })
-  communicationRequestId: Types.ObjectId;
 
   @Prop()
   token: string;

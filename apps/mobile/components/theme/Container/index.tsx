@@ -1,13 +1,6 @@
-import {
-  Box,
-  RestyleContainer,
-  RestyleContainerProps,
-} from "@/components/restyle";
+import { RestyleContainer, RestyleContainerProps } from "@/components/restyle";
 import { ContainerHeader, ContainerHeaderProps } from "../ContainerHeader";
-import { LinearGradient } from "expo-linear-gradient";
-import { Dimensions, StyleSheet } from "react-native";
-import { useTheme } from "@shopify/restyle";
-import { Theme } from "@/theme";
+import { Dimensions } from "react-native";
 
 export type ContainerProps = RestyleContainerProps & {
   hideHeader?: boolean;
@@ -24,37 +17,15 @@ export const Container = ({
   containerHeaderChildren,
   ...props
 }: ContainerProps) => {
-  const theme = useTheme<Theme>();
-
   return (
-    <LinearGradient
-      colors={[
-        theme.colors.backgroundGradient0,
-        theme.colors.backgroundGradient1,
-      ]}
-      style={[styles.background]}
-    >
-      <RestyleContainer {...props}>
-        {!hideHeader && (
-          <ContainerHeader
-            children={containerHeaderChildren}
-            {...containerHeaderProps}
-          />
-        )}
-        <Box mt="xxxl" />
-        {children}
-      </RestyleContainer>
-    </LinearGradient>
+    <RestyleContainer {...props}>
+      {!hideHeader && (
+        <ContainerHeader
+          children={containerHeaderChildren}
+          {...containerHeaderProps}
+        />
+      )}
+      {children}
+    </RestyleContainer>
   );
 };
-
-const styles = StyleSheet.create({
-  background: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    top: 0,
-    bottom: 0,
-    height: SCREEN_HEIGHT,
-  },
-});
