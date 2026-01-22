@@ -1,8 +1,7 @@
 import React, { useState, useCallback, useRef, useEffect } from "react";
 import { ActivityIndicator, View } from "react-native";
 import { useFocusEffect } from "expo-router";
-import { RestyleFlashListProps } from "@/components/restyle";
-import { FlashList } from "../FlashList";
+import { RestyleFlatList, RestyleFlatListProps } from "@/components/restyle";
 
 export type PaginatedResult<T> = {
   items: T[];
@@ -10,7 +9,7 @@ export type PaginatedResult<T> = {
 };
 
 export type PaginatedFlashListProps<T> = Omit<
-  RestyleFlashListProps,
+  RestyleFlatListProps,
   "data" | "extraData"
 > & {
   fetchData: (
@@ -101,7 +100,7 @@ export function PaginatedFlashList<T>({
   };
 
   return (
-    <FlashList
+    <RestyleFlatList
       {...props}
       data={data}
       onEndReached={handleLoadMore}

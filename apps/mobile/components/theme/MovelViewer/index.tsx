@@ -1,6 +1,6 @@
-import React, { Suspense, useState } from "react";
+import React, { Suspense, useState, useRef } from "react";
 import { ActivityIndicator, StyleSheet } from "react-native";
-import { Canvas } from "@react-three/fiber/native";
+import { Canvas, useFrame, useThree } from "@react-three/fiber/native";
 import { Center, Environment } from "@react-three/drei/native";
 import { Box } from "@/components/restyle";
 import { useViewerController } from "../useViewerController";
@@ -9,6 +9,9 @@ import Button from "../Button";
 import * as MediaLibrary from "expo-media-library";
 import { GifRecorder } from "../GifRecorder";
 import { DirectionalPad } from "../ControlButton";
+import * as THREE from "three";
+import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import { runOnJS } from "react-native-worklets";
 
 export type ModelViewerProps = {
   children: React.ReactNode;
@@ -27,6 +30,17 @@ const GL_CONFIG = {
   preserveDrawingBuffer: true,
 } as const;
 
+const CameraZoom = ({ zoom }: { zoom: number }) => {
+  const { camera } = useThree();
+
+  useFrame(() => {
+    camera.zoom = THREE.MathUtils.lerp(camera.zoom, zoom, 0.1);
+    camera.updateProjectionMatrix();
+  });
+
+  return null;
+};
+
 export const ModelViewer = ({
   children,
   initialRotation = [0, 0],
@@ -38,12 +52,33 @@ export const ModelViewer = ({
   const [isRecording, setIsRecording] = useState(false);
   const [status, requestPermission] = MediaLibrary.usePermissions();
 
+  const [zoom, setZoom] = useState(1);
+  const baseZoom = useRef(1);
+
   const handleRecord = async () => {
     if (status?.status !== "granted") {
       await requestPermission();
     }
     setIsRecording(true);
   };
+
+  const handlePinchUpdate = (scale: number) => {
+    let newZoom = baseZoom.current * scale;
+    newZoom = Math.max(0.5, Math.min(newZoom, 4));
+    setZoom(newZoom);
+  };
+
+  const handlePinchEnd = () => {
+    baseZoom.current = zoom;
+  };
+
+  const pinchGesture = Gesture.Pinch()
+    .onUpdate((e) => {
+      runOnJS(handlePinchUpdate)(e.scale);
+    })
+    .onEnd(() => {
+      runOnJS(handlePinchEnd);
+    });
 
   return (
     <Box style={[styles.container, { backgroundColor }]}>
@@ -54,6 +89,8 @@ export const ModelViewer = ({
         performance={{ min: 0.5 }}
       >
         <Suspense fallback={null}>
+          <CameraZoom zoom={zoom} />
+
           <Environment preset="dawn" />
           <InteractiveStage controller={controller}>
             <Center>{children}</Center>
@@ -92,11 +129,13 @@ export const ModelViewer = ({
         />
       </Box>
 
-      <Box
-        pointerEvents="auto"
-        style={StyleSheet.absoluteFill}
-        {...controller.panResponder.panHandlers}
-      />
+      <GestureDetector gesture={pinchGesture}>
+        <Box
+          pointerEvents="auto"
+          style={StyleSheet.absoluteFill}
+          {...controller.panResponder.panHandlers}
+        />
+      </GestureDetector>
 
       {showControls && <DirectionalPad controller={controller} />}
     </Box>

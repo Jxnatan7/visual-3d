@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Dimensions } from "react-native";
 import { RestyleContainer } from "@/components/restyle/Container";
 import { Box, Text } from "@/components/restyle";
@@ -10,15 +10,57 @@ import { useRouter } from "expo-router";
 import { useAuthActions, useUser } from "@/contexts/AuthProvider";
 import { ActionModal } from "@/components/theme/ActionModal";
 import { Model3DList } from "@/components/Model3DList";
+import { Model3D } from "@/services/Model3DService";
+import { preloadModel } from "@/components/theme/Model";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
+
+const ModelItem = ({ item, index }: { item: Model3D; index: number }) => {
+  const { push } = useRouter();
+  const CARD_WIDTH = (SCREEN_WIDTH - 56) / 2;
+
+  useEffect(() => {
+    if (item.modelUrls?.glb) {
+      preloadModel(item.modelUrls?.glb);
+    }
+  }, [item]);
+
+  return (
+    <RestyleCard
+      key={item._id?.toString()}
+      variant="model"
+      width={CARD_WIDTH}
+      height={CARD_WIDTH}
+      marginTop={index % 2 === 0 ? "l" : "none"}
+      marginBottom="minus"
+    >
+      <ModelImage
+        motiProps={{
+          onPress: () => {
+            push({
+              pathname: "/model-view",
+              params: {
+                id: item._id,
+                glb: item.modelUrls?.glb,
+              },
+            });
+          },
+        }}
+        uri={item.thumbnailUrl || item.imageUrl}
+      />
+    </RestyleCard>
+  );
+};
 
 export default function DashboardScreen() {
   const user = useUser();
   const { logout } = useAuthActions();
   const { push } = useRouter();
   const [openModal, setOpenModal] = useState(false);
-  const CARD_WIDTH = (SCREEN_WIDTH - 56) / 2;
+
+  const renderItem = ({ item, index }: any) => (
+    <ModelItem item={item} index={index} />
+  );
 
   return (
     <RestyleContainer
@@ -86,31 +128,7 @@ export default function DashboardScreen() {
 
       <Model3DList
         keyExtractor={(item: any) => item._id.toString()}
-        renderItem={({ item, index }: { item: any; index: number }) => (
-          <RestyleCard
-            key={item._id?.toString()}
-            variant="model"
-            width={CARD_WIDTH}
-            height={CARD_WIDTH}
-            marginTop={index % 2 === 0 ? "l" : "none"}
-            marginBottom="minus"
-          >
-            <ModelImage
-              motiProps={{
-                onPress: () => {
-                  push({
-                    pathname: "/model-view",
-                    params: {
-                      id: item._id,
-                      glb: item.modelUrls?.glb,
-                    },
-                  });
-                },
-              }}
-              uri={item.thumbnailUrl || item.imageUrl}
-            />
-          </RestyleCard>
-        )}
+        renderItem={renderItem}
       />
 
       <ActionModal

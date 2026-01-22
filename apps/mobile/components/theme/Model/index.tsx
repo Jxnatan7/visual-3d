@@ -10,3 +10,9 @@ export default function Model({ url }: { url?: string }) {
 
   return <primitive object={scene} />;
 }
+
+useGLTF.preload(modelUri);
+
+export const preloadModel = (url: string) => {
+  return useGLTF.preload(url);
+};

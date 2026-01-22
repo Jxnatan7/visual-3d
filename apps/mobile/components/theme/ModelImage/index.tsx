@@ -13,10 +13,10 @@ export const ModelImage = ({
 }) => {
   return (
     <MotiPressable
-      animate={({ hovered }) => {
+      animate={({ hovered, pressed }) => {
         "worklet";
         return {
-          scale: hovered ? 1.15 : 1,
+          scale: hovered || pressed ? 1.15 : 1,
         };
       }}
       transition={{

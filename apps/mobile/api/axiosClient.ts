@@ -3,8 +3,7 @@ import { useAuthStore } from "@/stores/authStore";
 import { useCommunicationRequestStore } from "@/stores/communicationRequestStore";
 import { Platform } from "react-native";
 
-const mobileBaseURL =
-  `${process.env.EXPO_PUBLIC_API_URL}/api/v1` || "http://localhost:3001/api/v1";
+const mobileBaseURL = `${process.env.EXPO_PUBLIC_API_URL}/api/v1`;
 
 const webBaseUrl = "http://localhost:3001/api/v1";
 
