@@ -1,5 +1,6 @@
-import { useMemo, useRef } from "react";
-import { PanResponder, PanResponderInstance } from "react-native";
+import { useRef, useState, useMemo } from "react";
+import { Gesture } from "react-native-gesture-handler";
+import { runOnJS } from "react-native-worklets";
 
 export type Vec2 = { x: number; y: number };
 
@@ -7,25 +8,28 @@ export type ViewerController = {
   rotationRef: React.MutableRefObject<Vec2>;
   buttonDirection: React.MutableRefObject<Vec2>;
   isInteracting: React.MutableRefObject<boolean>;
-  panResponder: PanResponderInstance;
+  gestures: any;
   setDirection: (x: number, y: number) => void;
   resetRotation: () => void;
   config: {
     autoRotate: boolean;
     rotationSensitivity: number;
   };
+  zoom: number;
 };
 
 export type UseViewerControllerProps = {
   initialRotation?: [number, number];
   rotationSensitivity?: number;
   autoRotate?: boolean;
+  initialZoom?: number;
 };
 
 export const useViewerController = ({
   initialRotation = [0, 0],
   rotationSensitivity = 0.005,
   autoRotate = true,
+  initialZoom = 1,
 }: UseViewerControllerProps): ViewerController => {
   const rotationRef = useRef<Vec2>({
     x: initialRotation[0],
@@ -34,38 +38,10 @@ export const useViewerController = ({
   const buttonDirection = useRef<Vec2>({ x: 0, y: 0 });
   const isInteracting = useRef(false);
 
-  const lastGesturePos = useRef<Vec2>({ x: 0, y: 0 });
+  const lastTranslation = useRef<Vec2>({ x: 0, y: 0 });
 
-  const panResponder = useMemo(
-    () =>
-      PanResponder.create({
-        onStartShouldSetPanResponder: () => true,
-        onMoveShouldSetPanResponder: () => true,
-        onPanResponderGrant: (_, state) => {
-          isInteracting.current = true;
-          buttonDirection.current = { x: 0, y: 0 };
-          lastGesturePos.current = { x: state.x0, y: state.y0 };
-        },
-        onPanResponderMove: (_, state) => {
-          const sensitivity = rotationSensitivity * 2;
-
-          const deltaX = state.moveX - lastGesturePos.current.x;
-          const deltaY = state.moveY - lastGesturePos.current.y;
-
-          rotationRef.current.y += deltaX * sensitivity;
-          rotationRef.current.x += deltaY * sensitivity;
-
-          lastGesturePos.current = { x: state.moveX, y: state.moveY };
-        },
-        onPanResponderRelease: () => {
-          isInteracting.current = false;
-        },
-        onPanResponderTerminate: () => {
-          isInteracting.current = false;
-        },
-      }),
-    [rotationSensitivity],
-  );
+  const [zoom, setZoom] = useState(initialZoom);
+  const baseZoom = useRef(initialZoom);
 
   const setDirection = (x: number, y: number) => {
     buttonDirection.current = { x, y };
@@ -76,13 +52,70 @@ export const useViewerController = ({
     rotationRef.current = { x: initialRotation[0], y: initialRotation[1] };
   };
 
+  const updateZoom = (scale: number) => {
+    let newZoom = baseZoom.current * scale;
+    newZoom = Math.max(0.5, Math.min(newZoom, 4));
+    setZoom(newZoom);
+  };
+
+  const endZoom = () => {
+    baseZoom.current = zoom;
+  };
+
+  const startPan = () => {
+    isInteracting.current = true;
+    buttonDirection.current = { x: 0, y: 0 };
+    lastTranslation.current = { x: 0, y: 0 };
+  };
+
+  const updatePan = (transX: number, transY: number) => {
+    const sensitivity = rotationSensitivity * 2;
+
+    const deltaX = transX - lastTranslation.current.x;
+    const deltaY = transY - lastTranslation.current.y;
+
+    rotationRef.current.y += deltaX * sensitivity;
+    rotationRef.current.x += deltaY * sensitivity;
+
+    lastTranslation.current = { x: transX, y: transY };
+  };
+
+  const endPan = () => {
+    isInteracting.current = false;
+  };
+
+  const gestures = useMemo(() => {
+    const pinch = Gesture.Pinch()
+      .onUpdate((e) => {
+        runOnJS(updateZoom)(e.scale);
+      })
+      .onEnd(() => {
+        runOnJS(endZoom)();
+      });
+
+    const pan = Gesture.Pan()
+      .minDistance(1)
+      .onStart(() => {
+        runOnJS(startPan)();
+      })
+      .onUpdate((e) => {
+        runOnJS(updatePan)(e.translationX, e.translationY);
+      })
+      .onEnd(() => {
+        runOnJS(endPan)();
+      });
+
+    return Gesture.Simultaneous(pan, pinch);
+  }, [zoom, rotationSensitivity]);
+
   return {
     rotationRef,
     buttonDirection,
     isInteracting,
-    panResponder,
+    gestures,
     setDirection,
     resetRotation,
     config: { autoRotate, rotationSensitivity },
+    zoom,
   };
 };

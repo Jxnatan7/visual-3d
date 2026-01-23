@@ -1,4 +1,4 @@
-import React, { Suspense, useState, useRef } from "react";
+import React, { Suspense, useState } from "react";
 import { ActivityIndicator, StyleSheet } from "react-native";
 import { Canvas, useFrame, useThree } from "@react-three/fiber/native";
 import { Center, Environment } from "@react-three/drei/native";
@@ -10,8 +10,7 @@ import * as MediaLibrary from "expo-media-library";
 import { GifRecorder } from "../GifRecorder";
 import { DirectionalPad } from "../ControlButton";
 import * as THREE from "three";
-import { Gesture, GestureDetector } from "react-native-gesture-handler";
-import { runOnJS } from "react-native-worklets";
+import { GestureDetector } from "react-native-gesture-handler";
 
 export type ModelViewerProps = {
   children: React.ReactNode;
@@ -49,11 +48,9 @@ export const ModelViewer = ({
   backgroundColor = "#121212",
 }: ModelViewerProps) => {
   const controller = useViewerController({ initialRotation, autoRotate });
+
   const [isRecording, setIsRecording] = useState(false);
   const [status, requestPermission] = MediaLibrary.usePermissions();
-
-  const [zoom, setZoom] = useState(1);
-  const baseZoom = useRef(1);
 
   const handleRecord = async () => {
     if (status?.status !== "granted") {
@@ -61,24 +58,6 @@ export const ModelViewer = ({
     }
     setIsRecording(true);
   };
-
-  const handlePinchUpdate = (scale: number) => {
-    let newZoom = baseZoom.current * scale;
-    newZoom = Math.max(0.5, Math.min(newZoom, 4));
-    setZoom(newZoom);
-  };
-
-  const handlePinchEnd = () => {
-    baseZoom.current = zoom;
-  };
-
-  const pinchGesture = Gesture.Pinch()
-    .onUpdate((e) => {
-      runOnJS(handlePinchUpdate)(e.scale);
-    })
-    .onEnd(() => {
-      runOnJS(handlePinchEnd);
-    });
 
   return (
     <Box style={[styles.container, { backgroundColor }]}>
@@ -89,7 +68,7 @@ export const ModelViewer = ({
         performance={{ min: 0.5 }}
       >
         <Suspense fallback={null}>
-          <CameraZoom zoom={zoom} />
+          <CameraZoom zoom={controller.zoom} />
 
           <Environment preset="dawn" />
           <InteractiveStage controller={controller}>
@@ -129,12 +108,8 @@ export const ModelViewer = ({
         />
       </Box>
 
-      <GestureDetector gesture={pinchGesture}>
-        <Box
-          pointerEvents="auto"
-          style={StyleSheet.absoluteFill}
-          {...controller.panResponder.panHandlers}
-        />
+      <GestureDetector gesture={controller.gestures}>
+        <Box pointerEvents="auto" style={StyleSheet.absoluteFill} />
       </GestureDetector>
 
       {showControls && <DirectionalPad controller={controller} />}
