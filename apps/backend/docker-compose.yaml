@@ -10,13 +10,32 @@ services:
       - "MONGO_INITDB_ROOT_USERNAME=admin"
       - "MONGO_INITDB_ROOT_PASSWORD=admin"
     healthcheck:
-      test: echo 'db.stats().ok' | mongo localhost:27017/easy-app-system --quiet
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 10s
+      retries: 5
       start_period: 10s
     volumes:
       - ./data/mongo:/data/db
       - ./docker/mongo/init-mongo.sh:/docker-entrypoint-initdb.d/init-mongo.sh:ro
     ports:
       - "27017:27017"
+    networks:
+      - easy-app-network
+
+  easy-app-api:
+    build: .
+    container_name: easy-app-api
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    env_file:
+      - .env
+    environment:
+      - DB_URL=mongodb://admin:admin@easy-app-mongo:27017/easy-app-system?authSource=admin
+    depends_on:
+      easy-app-mongo:
+        condition: service_healthy
     networks:
       - easy-app-network
 
