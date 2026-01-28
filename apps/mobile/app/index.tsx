@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Dimensions } from "react-native";
 import { RestyleContainer } from "@/components/restyle/Container";
 import { Box, Text } from "@/components/restyle";
@@ -9,21 +9,14 @@ import { ModelImage } from "@/components/theme/ModelImage";
 import { useRouter } from "expo-router";
 import { useAuthActions, useUser } from "@/contexts/AuthProvider";
 import { ActionModal } from "@/components/theme/ActionModal";
-import { Model3DList } from "@/components/Model3DList";
+import { Model3DList } from "@/components/theme/Model3DList";
 import { Model3D } from "@/services/Model3DService";
-import { preloadModel } from "@/components/theme/Model";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
 const ModelItem = ({ item, index }: { item: Model3D; index: number }) => {
   const { push } = useRouter();
   const CARD_WIDTH = (SCREEN_WIDTH - 56) / 2;
-
-  useEffect(() => {
-    if (item.modelUrls?.glb) {
-      preloadModel(item.modelUrls?.glb);
-    }
-  }, [item]);
 
   return (
     <RestyleCard
@@ -106,7 +99,6 @@ export default function DashboardScreen() {
           }
         />
       </RestyleCard>
-
       <Box flexDirection="row" justifyContent="flex-start" width="100%" mt="l">
         <Text variant="subHeader" fontWeight="bold" color="gray100">
           6{" "}
@@ -125,12 +117,10 @@ export default function DashboardScreen() {
       >
         Recent Creations
       </Text>
-
       <Model3DList
         keyExtractor={(item: any) => item._id.toString()}
         renderItem={renderItem}
       />
-
       <ActionModal
         visible={openModal}
         onClose={() => setOpenModal(false)}
@@ -142,6 +132,11 @@ export default function DashboardScreen() {
           push("/login");
         }}
         confirmText="Sair da conta"
+      />
+      <IconButton
+        variant="createModel"
+        icon={<MaterialIcons name="add" size={50} color="#ffffff" />}
+        onPress={() => push("/create-model")}
       />
     </RestyleContainer>
   );

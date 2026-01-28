@@ -1,11 +1,12 @@
 import React from "react";
 import { Dimensions, StyleSheet } from "react-native";
-import { Box, BoxProps, Text } from "@/components/restyle";
+import { Box, BoxProps, Text, TextProps } from "@/components/restyle";
 import { BackButton } from "../BackButton";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export type ContainerHeaderProps = {
   title?: string;
+  titleProps?: TextProps;
   children?: React.ReactNode;
   hideBackButton?: boolean;
   backButtonFallback?: () => void;
@@ -18,6 +19,7 @@ export const ContainerHeader = ({
   hideBackButton = false,
   children,
   backButtonFallback,
+  titleProps,
   ...props
 }: ContainerHeaderProps) => {
   const insets = useSafeAreaInsets();
@@ -38,7 +40,7 @@ export const ContainerHeader = ({
     >
       {!hideBackButton && <BackButton fallback={backButtonFallback} />}
       {title && (
-        <Text variant="containerHeader" flex={1}>
+        <Text variant="containerHeader" flex={1} {...titleProps}>
           {title}
         </Text>
       )}

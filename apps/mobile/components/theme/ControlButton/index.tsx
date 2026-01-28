@@ -28,8 +28,9 @@ export type DirectionalPadProps = {
 };
 
 export const DirectionalPad = ({ controller, style }: DirectionalPadProps) => {
-  const { setDirection, resetRotation } = controller;
+  const { setDirection, resetRotation, adjustZoom } = controller;
   const speed = 0.01;
+  const zoomStep = 0.2;
 
   return (
     <Box style={[styles.controlsContainer, style]}>
@@ -49,6 +50,14 @@ export const DirectionalPad = ({ controller, style }: DirectionalPadProps) => {
         <ControlButton label="↙" onPress={() => setDirection(speed, -speed)} />
         <ControlButton label="↓" onPress={() => setDirection(speed, 0)} />
         <ControlButton label="↘" onPress={() => setDirection(speed, speed)} />
+      </Box>
+
+      <Box style={styles.buttonRow} justifyContent="center">
+        <ControlButton label="—" onPress={() => adjustZoom(-zoomStep)} />
+        <Box width={50} justifyContent="center" alignItems="center">
+          <Text style={[styles.buttonText, { fontSize: 12 }]}>ZOOM</Text>
+        </Box>
+        <ControlButton label="+" onPress={() => adjustZoom(zoomStep)} />
       </Box>
     </Box>
   );

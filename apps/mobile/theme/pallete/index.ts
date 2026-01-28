@@ -53,6 +53,7 @@ const pallete = {
   otherMessageColor: "#000",
 
   error: "#FF0000",
+  success: "#00b000ff",
   finish: "#ff5252ff",
 
   pending: "#ff872bff",

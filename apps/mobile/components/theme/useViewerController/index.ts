@@ -15,6 +15,7 @@ export type ViewerController = {
     autoRotate: boolean;
     rotationSensitivity: number;
   };
+  adjustZoom: (delta: number) => void;
   zoom: number;
 };
 
@@ -50,6 +51,14 @@ export const useViewerController = ({
   const resetRotation = () => {
     buttonDirection.current = { x: 0, y: 0 };
     rotationRef.current = { x: initialRotation[0], y: initialRotation[1] };
+  };
+
+  const adjustZoom = (delta: number) => {
+    setZoom((prev) => {
+      const newZoom = Math.max(0.5, Math.min(prev + delta, 4));
+      baseZoom.current = newZoom;
+      return newZoom;
+    });
   };
 
   const updateZoom = (scale: number) => {
@@ -117,5 +126,6 @@ export const useViewerController = ({
     resetRotation,
     config: { autoRotate, rotationSensitivity },
     zoom,
+    adjustZoom,
   };
 };

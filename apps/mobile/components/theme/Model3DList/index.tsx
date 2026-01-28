@@ -3,7 +3,7 @@ import {
   PaginatedFlashList,
   PaginatedFlashListProps,
   PaginatedResult,
-} from "../theme/PaginatedFlashList";
+} from "../PaginatedFlashList";
 import useModels3D from "@/hooks/useModels3D";
 import { Model3D } from "@/services/Model3DService";
 

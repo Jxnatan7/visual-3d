@@ -149,6 +149,20 @@ const theme = createTheme({
     },
   },
   buttonVariants: {
+    createModel: {
+      width: 80,
+      height: 80,
+      borderRadius: 50,
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: "buttonBackgroundLight",
+      position: "absolute",
+      bottom: 30,
+    },
+    success: {
+      backgroundColor: "success",
+      color: "buttonTextLight",
+    },
     red: {
       backgroundColor: "finish",
       color: "buttonTextLight",
